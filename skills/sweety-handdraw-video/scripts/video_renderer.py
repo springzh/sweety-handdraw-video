@@ -58,6 +58,7 @@ class Renderer:
         self.hand=hand.resize((round(hand.width*scale),round(hand.height*scale)),Image.Resampling.LANCZOS)
         self.nib=np.array(self.timeline['hand']['nib'])*scale
         self.watermark = Image.open(self.timeline['watermark']['source']).convert('RGBA') if self.timeline.get('watermark') else None
+        self.corner_mark = Image.open(self.timeline['corner_mark']['source']).convert('RGBA') if self.timeline.get('corner_mark') else None
 
     def layer(self,event,time):
         name=event['asset']
@@ -143,6 +144,9 @@ class Renderer:
             frame = Image.blend(frame, Image.new('RGBA', frame.size, self.paper), ease(1 - remaining / fade))
         if getattr(self, 'watermark', None) is not None and time >= self.timeline['watermark']['start_seconds']:
             frame.alpha_composite(self.watermark, watermark_position(self.timeline['watermark'], self.width, self.height, time))
+        if getattr(self, 'corner_mark', None) is not None and time >= self.timeline['corner_mark']['start_seconds']:
+            # Composited last, after page slides and the ending fade, so it never moves
+            frame.alpha_composite(self.corner_mark, (self.timeline['corner_mark']['x'], self.timeline['corner_mark']['y']))
         return frame.convert('RGB')
 
 

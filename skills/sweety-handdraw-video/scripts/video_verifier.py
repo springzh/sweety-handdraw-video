@@ -24,6 +24,8 @@ def build_fingerprint(root):
              root / 'work' / 'audio-mix-report.json', root / 'outputs' / 'cover.png', Path(timeline['hand']['source'])]
     if timeline.get('watermark'):
         paths.append(Path(timeline['watermark']['source']))
+    if timeline.get('corner_mark'):
+        paths.append(Path(timeline['corner_mark']['source']))
     manifest = json.loads((root / 'job.json').read_text())
     if manifest.get('art_direction',{}).get('record'):
         paths.append(root/manifest['art_direction']['record'])

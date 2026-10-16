@@ -14,7 +14,7 @@ import stroke_assets
 from hand_assets import prepare_hand
 from art_direction import verify_art_direction
 from caption_assets import build_caption, resolve_cues
-from watermark_assets import prepare_watermark
+from watermark_assets import prepare_watermark, prepare_corner_mark
 from narration_master import load_master
 from audio_contract import resolve_audio_layers, validate_ending
 
@@ -338,6 +338,7 @@ class FilmBuilder:
                     'assets': self.assets, 'font': {'path': self.font_path, 'index': self.font_index},
                     'hand': prepare_hand(hand, self.root, self.work, self.height, self.font_path, self.font_index),
                     'watermark': prepare_watermark(self.manifest.get('watermark'), self.work, self.width, self.height),
+                    'corner_mark': prepare_corner_mark(self.manifest.get('corner_mark'), self.root, self.width, self.height, cover_seconds),
                     'art_direction': self.art_direction,
                     'manifest_sha256': hashlib.sha256((self.root / 'job.json').read_bytes()).hexdigest()}
         from subtitle_contract import validate_subtitles

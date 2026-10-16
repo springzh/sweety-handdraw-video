@@ -110,6 +110,8 @@ python3 /path/to/skill/scripts/handdraw_video.py verify /path/to/job
 
 `watermark:{"text":"用户原文，可换行","opacity":0.24}` 添加低对比、缓慢浮动水印；不配置或空文字不加。默认1080p约27px，可指定 `font/color/font_size`，不透明度上限0.35。固定封面静止阶段不漂移，从1秒正文开始显示，位置始终在画内并避开底部字幕。
 
+`corner_mark:{"source":"inputs/corner.png","x":1530,"y":28}` 可选：把一张已准备好的静态图（如课程名角标）固定在画面指定位置，从封面结束（1秒）起显示到片尾，不漂移、不随翻页滑动或片尾渐隐移动，合成在最上层。须完全在画内，且位于画面上部 3/4 以内以避开字幕；源文件计入构建指纹。正文内容应避开该区域。
+
 `ending.caption_hold_seconds` 可延长最后一句的阅读停留；必须小于或等于末句后停留减去渐隐的时间。字幕文字不变，SRT和实际画面一起延长。
 
 ## v1.3 整篇声音主时间线

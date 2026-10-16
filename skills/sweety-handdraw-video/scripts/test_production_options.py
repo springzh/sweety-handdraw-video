@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 from production_options import ChoiceSession, validate_choice, apply_choices
 from hand_assets import prepare_hand
-from watermark_assets import prepare_watermark, watermark_position
+from watermark_assets import prepare_watermark, watermark_position, prepare_corner_mark
 from timeline_contract import validate_timeline
 from caption_assets import build_caption
 from video_job import find_font
@@ -89,6 +89,17 @@ class ProductionOptionsTests(unittest.TestCase):
         for x,y in positions:
             self.assertGreaterEqual(x,0);self.assertGreaterEqual(y,0)
             self.assertLessEqual(x+mark['width'],1920);self.assertLessEqual(y+mark['height'],1080)
+
+    def test_optional_corner_mark_is_fixed_inside_frame_and_clear_of_captions(self):
+        self.assertIsNone(prepare_corner_mark(None,self.root,1920,1080))
+        Image.new('RGBA',(360,90),(0,0,0,255)).save(self.root/'corner.png')
+        mark=prepare_corner_mark({'source':'corner.png','x':1530,'y':28},self.root,1920,1080)
+        self.assertEqual((mark['x'],mark['y'],mark['width'],mark['height'],mark['motion']),(1530,28,360,90,'fixed'))
+        self.assertEqual(mark['start_seconds'],1.)
+        with self.assertRaisesRegex(ValueError,'inside the frame'):
+            prepare_corner_mark({'source':'corner.png','x':1600,'y':28},self.root,1920,1080)
+        with self.assertRaisesRegex(ValueError,'subtitle'):
+            prepare_corner_mark({'source':'corner.png','x':40,'y':900},self.root,1920,1080)
 
     def test_caption_plate_is_an_explicit_supported_choice(self):
         metadata=build_caption(self.root,'caption','完整字幕',{'background':{'color':'#243039','opacity':.76},'color':'#FFFFFF'},1920,1080)

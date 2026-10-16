@@ -1,4 +1,4 @@
-"""Build optional user-supplied text and keep its gentle drift inside the frame."""
+"""Build optional user-supplied text and keep its gentle drift inside the frame; place an optional fixed corner mark."""
 import math
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageColor
@@ -50,3 +50,19 @@ def watermark_position(mark, width, height, seconds):
     margin = round(24*scale)
     return (round(max(margin,min(width-mark['width']-margin,x))),
             round(max(margin,min(height-mark['height']-margin,y))))
+
+
+def prepare_corner_mark(options, root, width, height, start_seconds=1.):
+    """Optional static image (e.g. a course title) pinned at x/y on every body frame, from the end of the cover."""
+    if not options or options.get('enabled') is False:
+        return None
+    source = Path(options['source']).expanduser()
+    source = source.resolve() if source.is_absolute() else (Path(root) / source).resolve()
+    image = Image.open(source)
+    x, y = int(options['x']), int(options['y'])
+    if x < 0 or y < 0 or x + image.width > width or y + image.height > height:
+        raise ValueError('Corner mark must lie entirely inside the frame')
+    if y + image.height > height * .75:
+        raise ValueError('Corner mark must stay clear of the subtitle area at the bottom')
+    return {'source': str(source), 'x': x, 'y': y, 'width': image.width, 'height': image.height,
+            'start_seconds': start_seconds, 'motion': 'fixed'}
